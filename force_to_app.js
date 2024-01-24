@@ -32,8 +32,8 @@ accountId.addValueListener(value => {
 
 // variables
 let fileField = null,
-  imgEl = null,
   authToken = null,
+  imgSrc = null,
   digitalAsset = null;
 
 // functions
@@ -62,7 +62,7 @@ async function createDigitalAsset() {
       resolve();
       return;
     }
-    const file = dataURLtoFile(imgEl.src, fileField.files[0].name);
+    const file = dataURLtoFile(imgSrc, fileField.files[0].name);
     digitalAsset = new DigitalAsset(file);
     await digitalAsset.create(accountId.get(), authToken, 'production');
     resolve();
@@ -128,15 +128,11 @@ const preventDefaults = e => {
 
 const addHighlight = el => () => el.classList.add('highlight');
 const removeHighlight = el => () => el.classList.remove('highlight');
-const addHide = el => el.classList.add('hide');
-const removeHide = el => el.classList.remove('hide');
 
 document.addEventListener('DOMContentLoaded', function () {
   const sparkMD5Script = document.createElement('script');
   sparkMD5Script.src = 'https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js';
   document.head.appendChild(sparkMD5Script);
-  imgEl = document.getElementById('entry-point-image');
-  imgEl.src = null;
   const dropUploadArea = document.getElementById('drop-upload-area');
 
   fileField = document.getElementById('entry_point_file_upload');
@@ -167,6 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   reader.addEventListener('load', async () => {
+    imgSrc = reader.result;
     openAuthPortal();
   });
 });
