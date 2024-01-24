@@ -1,0 +1,172 @@
+import { DigitalAsset } from "./digital_asset.js";
+
+//constants
+// change base url depending on whether the page url includes 'local
+const baseUrl = 'https://book.soona.co';
+
+const reader = new FileReader();
+
+// reactive objects
+const accountId = {
+  value: null,
+  set(value) {
+    this.value = value;
+    this.valueListener(value);
+  },
+  get() {
+    return this.value;
+  },
+  valueListener(value) {},
+  addValueListener: function (listener) {
+    this.valueListener = listener;
+  },
+};
+
+accountId.addValueListener(value => {
+  if (!value) return;
+  else {
+    navigationProcess();
+  }
+});
+
+
+// variables
+let fileField = null,
+  imgEl = null,
+  authToken = null,
+  digitalAsset = null;
+
+// functions
+
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[arr.length - 1]), 
+      n = bstr.length, 
+      u8arr = new Uint8Array(n);
+  while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, {type:mime});
+}
+
+async function navigationProcess() {
+  if(!authToken || authToken === 'null' || authToken === 'undefined') return;
+  await createDigitalAsset();
+  window.location.href = createMediaEditorPath();
+}
+
+async function createDigitalAsset() {
+  return new Promise(async (resolve, reject) => {
+    if (!fileField.files[0]){
+      resolve();
+      return;
+    }
+    const file = dataURLtoFile(imgEl.src, fileField.files[0].name);
+    digitalAsset = new DigitalAsset(file);
+    await digitalAsset.create(accountId.get(), authToken, 'production');
+    resolve();
+  }
+  );
+}
+
+function createMediaEditorPath() {
+  if (digitalAsset?.digitalAsset?.id) {
+  return `${baseUrl}/#/account/${digitalAsset.accountId}/asset/${digitalAsset.digitalAsset.id}?album=account`;
+  } else {
+    return `${baseUrl}/#/account/${accountId.get()}`;
+  }
+}
+
+// auth portal
+
+function receiveMessage(event) {
+  if (event.origin !== baseUrl) return;
+  let splitData = event.data.split(',');
+  authToken = splitData[1].split(':')[1];
+  if (!authToken || authToken === 'null' || authToken === 'undefined') return;
+  accountId.set(splitData[0].split(':')[1]);
+}
+
+function openAuthPortal() {
+  let popupWinWidth = 500;
+  let popupWinHeight = 600;
+  let left = window.screenX + (window.outerWidth - popupWinWidth) / 2;
+  let top = window.screenY + (window.outerHeight - popupWinHeight) / 2;
+  let popUpUrl = `${baseUrl}/#/sign-up?isExternalAuthPortal=true&redirect=/sign-in%3FisExternalAuthPortal=true`;
+  let newWindow = window.open(popUpUrl,'google window','width='+popupWinWidth+',height='+popupWinHeight+',top='+top+',left='+left);
+  newWindow.focus()
+  // add event listener to receive message from auth portal
+  window.addEventListener('message', receiveMessage, false);
+}
+
+
+// drag and drop image code
+const handleDrop = () => {
+  return e => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+
+    if (files.length > 1) {
+      alert('Please upload only one image');
+      return;
+    }
+
+    if (!['image/jpg', 'image/jpeg', 'image/png'].includes(files[0].type)) {
+      alert('Please use a valid image');
+      return;
+    }
+
+    reader.readAsDataURL(files[0]);
+  }
+};
+
+const preventDefaults = e => {
+  e.preventDefault();
+  e.stopPropagation();
+};
+
+const addHighlight = el => () => el.classList.add('highlight');
+const removeHighlight = el => () => el.classList.remove('highlight');
+const addHide = el => el.classList.add('hide');
+const removeHide = el => el.classList.remove('hide');
+
+document.addEventListener('DOMContentLoaded', function () {
+  const sparkMD5Script = document.createElement('script');
+  sparkMD5Script.src = 'https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js';
+  document.head.appendChild(sparkMD5Script);
+  imgEl = document.getElementById('entry-point-image');
+  imgEl.src = null;
+  const dropUploadArea = document.getElementById('drop-upload-area');
+
+  fileField = document.getElementById('entry_point_file_upload');
+  fileField.accept = 'image/png, image/jpeg, image/jpg';
+  
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropUploadArea.addEventListener(eventName, preventDefaults, false)
+  });
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropUploadArea.addEventListener(eventName, addHighlight(dropUploadArea), false)
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropUploadArea.addEventListener(eventName, removeHighlight(dropUploadArea), false)
+  });
+
+  dropUploadArea.addEventListener('drop', handleDrop(fileField), false);
+
+  fileField.addEventListener('change', function () {
+    if (fileField.value == '') { return; }
+    if (!['image/jpg', 'image/jpeg', 'image/png'].includes(fileField.files[0].type)) {
+      alert('Please use a valid image');
+      return;
+    }
+    reader.readAsDataURL(fileField.files[0]);
+  });
+
+  reader.addEventListener('load', async () => {
+    openAuthPortal();
+  });
+});
