@@ -131,8 +131,8 @@ const preventDefaults = e => {
 
 const addHighlight = el => () => el.classList.add('highlight');
 const removeHighlight = el => () => el.classList.remove('highlight');
-const addHideClass = el => () => el.classList.add('hide');
-const removeHideClass = el => () => el.classList.remove('hide');
+const addHideClass = el => el.classList.add('hide');
+const removeHideClass = el => el.classList.remove('hide');
 
 document.addEventListener('DOMContentLoaded', function () {
   const sparkMD5Script = document.createElement('script');
