@@ -34,6 +34,7 @@ accountId.addValueListener(value => {
 let fileField = null,
   authToken = null,
   imgSrc = null,
+  loadingSpinner = null,
   digitalAsset = null;
 
 // functions
@@ -53,6 +54,7 @@ function dataURLtoFile(dataurl, filename) {
 async function navigationProcess() {
   if(!authToken || authToken === 'null' || authToken === 'undefined') return;
   await createDigitalAsset();
+  addHideClass(loadingSpinner);
   window.location.href = createMediaEditorPath();
 }
 
@@ -128,12 +130,15 @@ const preventDefaults = e => {
 
 const addHighlight = el => () => el.classList.add('highlight');
 const removeHighlight = el => () => el.classList.remove('highlight');
+const addHideClass = el => () => el.classList.add('hide');
+const removeHideClass = el => () => el.classList.remove('hide');
 
 document.addEventListener('DOMContentLoaded', function () {
   const sparkMD5Script = document.createElement('script');
   sparkMD5Script.src = 'https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js';
   document.head.appendChild(sparkMD5Script);
   const dropUploadArea = document.getElementById('drop-upload-area');
+  loadingSpinner = document.getElementsByClassName('entry-point_lottie-wrap')[0];
 
   fileField = document.getElementById('entry_point_file_upload');
   fileField.accept = 'image/png, image/jpeg, image/jpg';
@@ -163,6 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   reader.addEventListener('load', async () => {
+    removeHideClass(loadingSpinner);
     imgSrc = reader.result;
     openAuthPortal();
   });
