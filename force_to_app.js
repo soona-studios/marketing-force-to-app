@@ -53,6 +53,7 @@ function dataURLtoFile(dataurl, filename) {
 
 async function navigationProcess() {
   if(!authToken || authToken === 'null' || authToken === 'undefined') return;
+  removeHideClass(loadingSpinner);
   await createDigitalAsset();
   addHideClass(loadingSpinner);
   window.location.href = createMediaEditorPath();
@@ -168,7 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   reader.addEventListener('load', async () => {
-    removeHideClass(loadingSpinner);
     imgSrc = reader.result;
     openAuthPortal();
   });
