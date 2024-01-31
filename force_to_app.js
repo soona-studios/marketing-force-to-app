@@ -81,6 +81,30 @@ function createMediaEditorPath() {
   }
 }
 
+function getContextFromUrl() {
+  let url = window.location.href;
+  let splitUrl = url.split('/');
+  let context = splitUrl[splitUrl.length - 1];
+  context = context.replace(/[\-_]/g, ' ');
+  return context;
+}
+
+function fileUploaded(subContext, fileType, fileSize, fileHeight, fileWidth) {
+  try {
+    analytics.track('File Uploaded',
+    {
+      context: getContextFromUrl(),
+      subContext: subContext,
+      fileType: fileType,
+      fileSize: fileSize,
+      fileHeight: fileHeight,
+      fileWidth: fileWidth,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // auth portal
 
 function receiveMessage(event) {
@@ -157,10 +181,14 @@ document.addEventListener('DOMContentLoaded', function () {
     dropUploadArea.addEventListener(eventName, removeHighlight(dropUploadArea), false)
   });
 
-  dropUploadArea.addEventListener('drop', handleDrop(fileField), false);
+  dropUploadArea.addEventListener('drop', () => {
+    fileUploaded('main file uploader', fileField.files[0].type, fileField.files[0].size, fileField.files[0].height, fileField.files[0].width);
+    handleDrop(fileField);
+  }, false);
 
   fileField.addEventListener('change', function () {
     if (fileField.value == '') { return; }
+    fileUploaded('main file uploader', fileField.files[0].type, fileField.files[0].size, fileField.files[0].height, fileField.files[0].width);
     if (!['image/jpg', 'image/jpeg', 'image/png'].includes(fileField.files[0].type)) {
       alert('Please use a valid image');
       return;
