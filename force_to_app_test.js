@@ -138,13 +138,8 @@ const handleDrop = () => {
       alert('Please upload only one image');
       return;
     }
-
-    if (!['image/jpg', 'image/jpeg', 'image/png'].includes(files[0].type)) {
-      alert('Please use a valid image');
-      return;
-    }
-
-    reader.readAsDataURL(files[0]);
+    fileField.files = files;
+    fileField.dispatchEvent(new Event('change'));
   }
 };
 
@@ -181,10 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
     dropUploadArea.addEventListener(eventName, removeHighlight(dropUploadArea), false)
   });
 
-  dropUploadArea.addEventListener('drop', () => {
-    fileUploaded('main file uploader', fileField.files[0].type, fileField.files[0].size, fileField.files[0].height, fileField.files[0].width);
-    handleDrop(fileField);
-  }, false);
+  dropUploadArea.addEventListener('drop', handleDrop(fileField), false);
 
   fileField.addEventListener('change', function () {
     if (fileField.value == '') { return; }
