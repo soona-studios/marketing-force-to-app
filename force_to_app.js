@@ -41,7 +41,7 @@ let fileField = null,
 // functions
 function setMediaEditorToolFromURL() {
   let splitURL = window.location.href.split('/');
-  let keyWords = ['shadow', 'blur', 'resize']
+  let keyWords = ['shadows', 'blur', 'resize']
   mediaEditorTool = keyWords.find(word => splitURL.includes(word)) || null;
 }
 
@@ -81,7 +81,12 @@ async function createDigitalAsset() {
 
 function createMediaEditorPath() {
   if (digitalAsset?.digitalAsset?.id) {
-  return `${baseUrl}/#/account/${digitalAsset.accountId}/asset/${digitalAsset.digitalAsset.id}?album=account`;
+    setMediaEditorToolFromURL()
+    let url = `${baseUrl}/#/account/${digitalAsset.accountId}/asset/${digitalAsset.digitalAsset.id}?album=account`;
+    if (mediaEditorTool) {
+      url += `&tool=${mediaEditorTool}`;
+    }
+    return url;
   } else {
     return `${baseUrl}/#/account/${accountId.get()}`;
   }
