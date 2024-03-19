@@ -35,9 +35,15 @@ let fileField = null,
   authToken = null,
   imgSrc = null,
   loadingSpinner = null,
-  digitalAsset = null;
+  digitalAsset = null,
+  mediaEditorTool = null;
 
 // functions
+function setMediaEditorToolFromURL() {
+  let splitURL = window.location.href.split('/');
+  let keyWords = ['shadow', 'blur', 'resize']
+  mediaEditorTool = keyWords.find(word => splitURL.includes(word)) || null;
+}
 
 function dataURLtoFile(dataurl, filename) {
   var arr = dataurl.split(','),
@@ -75,7 +81,11 @@ async function createDigitalAsset() {
 
 function createMediaEditorPath() {
   if (digitalAsset?.digitalAsset?.id) {
-  return `${baseUrl}/#/account/${digitalAsset.accountId}/asset/${digitalAsset.digitalAsset.id}?album=account`;
+  let url = `${baseUrl}/#/account/${digitalAsset.accountId}/asset/${digitalAsset.digitalAsset.id}?album=account`;
+  if (mediaEditorTool) {
+    url += `&tool=${mediaEditorTool}`;
+  }
+  return url;
   } else {
     return `${baseUrl}/#/account/${accountId.get()}`;
   }

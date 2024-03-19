@@ -35,9 +35,15 @@ let fileField = null,
   authToken = null,
   imgSrc = null,
   loadingSpinner = null,
-  digitalAsset = null;
+  digitalAsset = null,
+  mediaEditorTool = null;
 
 // functions
+function setMediaEditorToolFromURL() {
+  let splitURL = window.location.href.split('/');
+  let keyWords = ['shadow', 'blur', 'resize']
+  mediaEditorTool = keyWords.find(word => splitURL.includes(word)) || null;
+}
 
 function dataURLtoFile(dataurl, filename) {
   var arr = dataurl.split(','),
