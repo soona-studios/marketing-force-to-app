@@ -41,7 +41,7 @@ let fileField = null,
 // functions
 function setMediaEditorToolFromURL() {
   let splitURL = window.location.href.split('/');
-  splitURL = splitURL[splitURL.length-1]?.toLowerCase
+  splitURL = splitURL[splitURL.length-1]?.toLowerCase();
   let keyWords = ['shadows', 'blur', 'resize']
   mediaEditorTool = keyWords.find(word => splitURL.includes(word)) || null;
 }
