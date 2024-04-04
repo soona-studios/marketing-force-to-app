@@ -42,8 +42,11 @@ let fileField = null,
 function setMediaEditorToolFromURL() {
   let splitURL = window.location.href.split('/');
   splitURL = splitURL[splitURL.length-1]?.toLowerCase();
-  let keyWords = ['shadows', 'blur', 'resize']
+  let keyWords = ['shadows', 'blur', 'resize', 'mokker']
   mediaEditorTool = keyWords.find(word => splitURL.includes(word)) || null;
+  if (mediaEditorTool === 'mokker') {
+    mediaEditorTool = 'ai-studio';
+  }
 }
 
 function dataURLtoFile(dataurl, filename) {
