@@ -32,6 +32,7 @@ accountId.addValueListener(value => {
 
 // variables
 let fileField = null,
+  fileFieldTries = 0,
   authToken = null,
   imgSrc = null,
   loadingSpinner = null,
@@ -120,6 +121,31 @@ function fileUploaded(subContext, fileType, fileSize, fileHeight, fileWidth) {
   }
 }
 
+function setUpFileField() {
+  if (fileFieldTries > 4) {
+    console.error('Could not find file upload field');
+    return
+  } else {
+    fileField = document.getElementById('entry_point_file_upload');
+    tries++;
+  }
+  if (!fileField) {
+    setTimeout(setUpFileField, 250);
+  } else {
+    fileField.accept = 'image/png, image/jpeg, image/jpg';
+
+    fileField.addEventListener('change', function () {
+      if (fileField.value == '') { return; }
+      fileUploaded('main file uploader', fileField.files[0].type, fileField.files[0].size, fileField.files[0].height, fileField.files[0].width);
+      if (!['image/jpg', 'image/jpeg', 'image/png'].includes(fileField.files[0].type)) {
+        alert('Please use a valid image');
+        return;
+      }
+      reader.readAsDataURL(fileField.files[0]);
+    });
+  }
+}
+
 // auth portal
 
 function receiveMessage(event) {
@@ -174,20 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.head.appendChild(sparkMD5Script);
   const dropUploadArea = document.getElementById('drop-upload-area');
   loadingSpinner = document.getElementsByClassName('entry-point_lottie-wrap')[0];
-  
-  let tries = 0;
-
-  while (!fileField) {
-    if (tries > 4) {
-      console.error('Could not find file upload field');
-      break;
-    }
-    fileField = document.getElementById('entry_point_file_upload');
-    tries++;
-    setTimeout(() => {}, "250");
-  }
-
-  fileField.accept = 'image/png, image/jpeg, image/jpg';  
+  setUpFileField();
 
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropUploadArea.addEventListener(eventName, preventDefaults, false)
@@ -203,15 +216,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   dropUploadArea.addEventListener('drop', handleDrop(fileField), false);
 
-  fileField.addEventListener('change', function () {
-    if (fileField.value == '') { return; }
-    fileUploaded('main file uploader', fileField.files[0].type, fileField.files[0].size, fileField.files[0].height, fileField.files[0].width);
-    if (!['image/jpg', 'image/jpeg', 'image/png'].includes(fileField.files[0].type)) {
-      alert('Please use a valid image');
-      return;
-    }
-    reader.readAsDataURL(fileField.files[0]);
-  });
 
   reader.addEventListener('load', async () => {
     imgSrc = reader.result;
