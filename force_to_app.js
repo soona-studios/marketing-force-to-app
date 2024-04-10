@@ -127,7 +127,7 @@ function setUpFileField() {
     return
   } else {
     fileField = document.getElementById('entry_point_file_upload');
-    tries++;
+    fileFieldTries++;
   }
   if (!fileField) {
     setTimeout(setUpFileField, 250);
