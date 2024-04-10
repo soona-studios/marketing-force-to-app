@@ -33,6 +33,7 @@ accountId.addValueListener(value => {
 // variables
 let fileField = null,
   fileFieldTries = 0,
+  dropUploadAreaTries = 0,
   authToken = null,
   imgSrc = null,
   loadingSpinner = null,
@@ -40,6 +41,11 @@ let fileField = null,
   mediaEditorTool = null;
 
 // functions
+const preventDefaults = e => {
+  e.preventDefault();
+  e.stopPropagation();
+};
+
 function setMediaEditorToolFromURL() {
   let splitURL = window.location.href.split('/');
   splitURL = splitURL[splitURL.length-1]?.toLowerCase();
@@ -146,6 +152,33 @@ function setUpFileField() {
   }
 }
 
+function setUpDropUploadArea() {
+  if (dropUploadAreaTries > 4) {
+    console.error('Could not find drop upload area');
+    return
+  } else {
+    const dropUploadArea = document.getElementById('drop-upload-area');
+    dropUploadAreaTries++;
+  }
+  if (!dropUploadArea) {
+    setTimeout(setUpDropUploadArea, 250);
+  } else {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropUploadArea.addEventListener(eventName, preventDefaults, false)
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropUploadArea.addEventListener(eventName, addHighlight(dropUploadArea), false)
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropUploadArea.addEventListener(eventName, removeHighlight(dropUploadArea), false)
+    });
+
+    dropUploadArea.addEventListener('drop', handleDrop(fileField), false);
+  }
+}
+
 // auth portal
 
 function receiveMessage(event) {
@@ -184,11 +217,6 @@ const handleDrop = () => {
   }
 };
 
-const preventDefaults = e => {
-  e.preventDefault();
-  e.stopPropagation();
-};
-
 const addHighlight = el => () => el?.classList.add('highlight');
 const removeHighlight = el => () => el?.classList.remove('highlight');
 const addHideClass = el => el?.classList.add('hide');
@@ -198,24 +226,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const sparkMD5Script = document.createElement('script');
   sparkMD5Script.src = 'https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js';
   document.head.appendChild(sparkMD5Script);
-  const dropUploadArea = document.getElementById('drop-upload-area');
   loadingSpinner = document.getElementsByClassName('entry-point_lottie-wrap')[0];
   setUpFileField();
-
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropUploadArea.addEventListener(eventName, preventDefaults, false)
-  });
-
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropUploadArea.addEventListener(eventName, addHighlight(dropUploadArea), false)
-  });
-
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropUploadArea.addEventListener(eventName, removeHighlight(dropUploadArea), false)
-  });
-
-  dropUploadArea.addEventListener('drop', handleDrop(fileField), false);
-
+  setUpDropUploadArea();
 
   reader.addEventListener('load', async () => {
     imgSrc = reader.result;
