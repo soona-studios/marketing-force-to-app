@@ -174,10 +174,20 @@ document.addEventListener('DOMContentLoaded', function () {
   document.head.appendChild(sparkMD5Script);
   const dropUploadArea = document.getElementById('drop-upload-area');
   loadingSpinner = document.getElementsByClassName('entry-point_lottie-wrap')[0];
-
-  fileField = document.getElementById('entry_point_file_upload');
-  fileField.accept = 'image/png, image/jpeg, image/jpg';
   
+  let tries = 0;
+
+  while (!fileField) {
+    if (tries > 4) {
+      console.error('Could not find file upload field');
+      break;
+    }
+    fileField = document.getElementById('entry_point_file_upload');
+    tries++;
+    setTimeout(() => {}, "250");
+  }
+
+  fileField.accept = 'image/png, image/jpeg, image/jpg';  
 
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropUploadArea.addEventListener(eventName, preventDefaults, false)

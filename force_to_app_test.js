@@ -175,7 +175,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const dropUploadArea = document.getElementById('drop-upload-area');
   loadingSpinner = document.getElementsByClassName('entry-point_lottie-wrap')[0];
 
-  fileField = document.getElementById('entry_point_file_upload');
+  let tries = 0;
+
+  while (!fileField) {
+    if (tries > 4) {
+      console.error('Could not find file upload field');
+      break;
+    }
+    fileField = document.getElementById('entry_point_file_upload');
+    tries++;
+    setTimeout(() => {}, "250");
+  }
+
   fileField.accept = 'image/png, image/jpeg, image/jpg';
   
 
