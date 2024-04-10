@@ -153,11 +153,12 @@ function setUpFileField() {
 }
 
 function setUpDropUploadArea() {
+  let dropUploadArea = null;
   if (dropUploadAreaTries > 4) {
     console.error('Could not find drop upload area');
     return
   } else {
-    const dropUploadArea = document.getElementById('drop-upload-area');
+    dropUploadArea = document.getElementById('drop-upload-area');
     dropUploadAreaTries++;
   }
   if (!dropUploadArea) {
