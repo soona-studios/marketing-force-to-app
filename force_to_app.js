@@ -93,7 +93,7 @@ async function createDigitalAsset() {
 function createMediaEditorPath() {
   if (digitalAsset?.digitalAsset?.id) {
     setMediaEditorToolFromURL()
-    let url = `${baseUrl}/#/account/${digitalAsset.accountId}/asset/${digitalAsset.digitalAsset.id}?album=account`;
+    let url = `${baseUrl}/#/account/${digitalAsset.accountId}/gallery/uploads/asset/${digitalAsset.digitalAsset.id}`;
     if (mediaEditorTool) {
       url += `&tool=${mediaEditorTool}`;
     }
