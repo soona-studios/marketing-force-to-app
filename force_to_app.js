@@ -50,6 +50,9 @@ function setMediaEditorToolFromURL() {
   splitURL = splitURL[splitURL.length - 1]?.toLowerCase();
   let keyWords = ['shadows', 'blur', 'resize', 'mokker', 'remove-background'];
   mediaEditorTool = keyWords.find(word => splitURL.includes(word)) || null;
+  if (splitURL.includes('background')) {
+    mediaEditorTool = 'background-color';
+  }
   if (mediaEditorTool === 'mokker') {
     mediaEditorTool = 'ai-studio';
   }
