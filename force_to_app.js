@@ -50,7 +50,9 @@ function setMediaEditorToolFromURL() {
   splitURL = splitURL[splitURL.length - 1]?.toLowerCase();
   let keyWords = ['shadows', 'blur', 'resize', 'mokker', 'remove-background'];
   mediaEditorTool = keyWords.find(word => splitURL.includes(word)) || null;
-  if (mediaEditorTool === 'mokker') {
+  if (splitURL.includes('background')) {
+    mediaEditorTool = 'background-color';
+  } else if (mediaEditorTool === 'mokker') {
     mediaEditorTool = 'ai-studio';
   }
 }
@@ -91,7 +93,11 @@ async function createDigitalAsset() {
 function createMediaEditorPath() {
   if (digitalAsset?.digitalAsset?.id) {
     setMediaEditorToolFromURL();
-    return `${baseUrl}/#/account/${digitalAsset.accountId}/gallery/uploads/asset/${digitalAsset.digitalAsset.id}?tool=${mediaEditorTool || ''}`;
+    return `${baseUrl}/#/account/${
+      digitalAsset.accountId
+    }/gallery/uploads/asset/${digitalAsset.digitalAsset.id}?tool=${
+      mediaEditorTool || ''
+    }`;
   } else {
     return `${baseUrl}/#/account/${accountId.get()}`;
   }
